@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { AdminStats } from "@/lib/types";
 import { getProductCount } from "@/lib/database/products";
 import { getServiceCount } from "@/lib/database/services";
