@@ -14,6 +14,7 @@ export async function getServices(params: {
   search?: string;
   category?: string;
   featured?: boolean;
+  filters?: string;
 }): Promise<PaginatedResponse<ServiceType> | Error | null> {
   try {
     await connectDB();
@@ -45,6 +46,7 @@ export async function getServices(params: {
       .limit(limit)
 
     return {
+      success: true,
       data: services,
       pagination: {
         page,

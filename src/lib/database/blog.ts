@@ -49,6 +49,7 @@ export async function getBlogPosts(params: {
     .limit(limit)
 
   return {
+    success: true,
     data: posts,
     pagination: {
       page,

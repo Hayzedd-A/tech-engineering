@@ -180,7 +180,7 @@ export interface ProductType {
   name: string;
   description: string;
   price: number;
-  originalPrice?: number;
+  condition: "New" | "Used" | "Refurbished";
   category: string;
   brand: string;
   image: string;

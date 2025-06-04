@@ -9,11 +9,16 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
 
     const result = await getServices({ page, limit, search });
-
+    if (result instanceof Error) {
+      return NextResponse.json({
+        success: false,
+        data: null
+      })
+    }
     return NextResponse.json({
       success: true,
-      data: result.data,
-      pagination: result.pagination,
+      data: result?.data || [],
+      pagination: result?.pagination || [],
     });
   } catch (error) {
     console.error(error)

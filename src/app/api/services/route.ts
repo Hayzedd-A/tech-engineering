@@ -36,10 +36,13 @@ export async function GET(request: NextRequest) {
       filters,
     });
     if (!result) {
-      throw new Error("Error getting services")
+      throw new Error("Error getting services");
     }
-      
-      return NextResponse.json({
+    if (result instanceof Error) {
+      throw new Error("Result is error:", result);
+    }
+
+    return NextResponse.json({
       success: true,
       data: result.data,
       pagination: result.pagination,
