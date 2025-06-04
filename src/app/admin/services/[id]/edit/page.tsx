@@ -19,9 +19,9 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import { ServiceType } from "@/lib/types";
 
 interface EditServicePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditServicePage({ params }: EditServicePageProps) {
@@ -29,15 +29,25 @@ export default function EditServicePage({ params }: EditServicePageProps) {
   const [features, setFeatures] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [serviceId, setServiceId] = useState("")
   const router = useRouter();
+
+   useEffect(() => {
+     const initializeParams = async () => {
+       const resolvedParams = await params;
+       setServiceId(resolvedParams.id);
+     };
+
+     initializeParams();
+   }, [params]);
 
   useEffect(() => {
     fetchService();
-  }, [params.id]);
+  }, [serviceId]);
 
   const fetchService = async () => {
     try {
-      const response = await fetch(`/api/admin/services/${params.id}`);
+      const response = await fetch(`/api/admin/services/${serviceId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -67,7 +77,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
         features: features.split("\n").filter((feature) => feature.trim()),
       };
 
-      const response = await fetch(`/api/admin/services/${params.id}`, {
+      const response = await fetch(`/api/admin/services/${serviceId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

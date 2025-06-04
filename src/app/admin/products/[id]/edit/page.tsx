@@ -19,9 +19,9 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import { ProductType } from "@/lib/types";
 
 interface EditProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditProductPage({ params }: EditProductPageProps) {
@@ -29,15 +29,29 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [specifications, setSpecifications] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [productId, setProductId] = useState("")
   const router = useRouter();
 
+   useEffect(() => {
+     const initializeParams = async () => {
+       const resolvedParams = await params;
+       setProductId(resolvedParams.id);
+     };
+
+     initializeParams();
+   }, [params]);
+
+
   useEffect(() => {
-    fetchProduct();
-  }, [params.id]);
+    if (productId) {
+
+      fetchProduct();
+    }
+  }, [productId]);
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`/api/admin/products/${params.id}`);
+      const response = await fetch(`/api/admin/products/${productId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -69,7 +83,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           .filter((spec) => spec.trim()),
       };
 
-      const response = await fetch(`/api/admin/products/${params.id}`, {
+      const response = await fetch(`/api/admin/products/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
