@@ -38,7 +38,6 @@
 export interface Testimonial {
   id: string;
   name: string;
-  service: string;
   rating: number;
   comment: string;
   image?: string;
