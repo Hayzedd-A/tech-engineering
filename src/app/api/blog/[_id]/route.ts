@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogPostById } from "@/lib/database/blog";
 
-interface RouteParams {
-  params: {
-    _id: string;
-  };
-}
+// interface RouteParams {
+//   params: {
+//     _id: string;
+//   };
+// }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ _id: string }> }
+) {
   try {
-    const { _id } = params;
+    const { _id } = await context.params;
 
     // Validate ID parameter
     if (!_id) {
