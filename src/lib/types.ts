@@ -187,7 +187,7 @@ export interface ProductType {
   inStock: boolean;
   stockQuantity: number;
   featured: boolean;
-  specifications: Record<string, string>;
+  specifications: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
