@@ -9,22 +9,34 @@ import { BlogPostType } from "@/lib/types";
 import { useEffect, useState } from "react";
 
 interface BlogPostPageProps {
-  params: {
-    _id: string;
-  };
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default function BlogPostPage({ params }: BlogPostPageProps) {
   const [post, setPost] = useState<BlogPostType>();
   const [loading, setLoading] = useState(true);
+  const [postId, setPostId] = useState("")
+
+  useEffect(() => {
+
+    const initializeParams = async () => {
+      const resolvedParams = await params;
+      setPostId(resolvedParams.id);
+    };
+
+    initializeParams();
+  }, [params])
+
   useEffect(() => {
     (async () => {
-      const response = await fetch(`/api/blog/${params._id}`);
+      const response = await fetch(`/api/blog/${postId}`);
       const result = await response.json();
       setLoading(false);
       if (result) setPost({...result, updatedAt: new Date(result.updatedAt).toLocaleDateString()});
     })();
-  }, [params._id]);
+  }, [postId]);
 
   if (!post) {
     notFound();
