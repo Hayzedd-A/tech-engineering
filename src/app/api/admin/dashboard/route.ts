@@ -3,7 +3,8 @@ import { AdminStats } from "@/lib/types";
 import { getProductCount } from "@/lib/database/products";
 import { getServiceCount } from "@/lib/database/services";
 import { getBlogPostCount } from "@/lib/database/blog";
-import { getTestimonialCount } from "@/lib/database/testimonials";
+// import { getTestimonialCount } from "@/lib/database/testimonials";
+import { testimonials } from "@/lib/data";
 
 export async function GET() {
   try {
@@ -11,7 +12,8 @@ export async function GET() {
       totalProducts: await getProductCount(),
       totalServices: await getServiceCount(),
       totalBlogPosts: await getBlogPostCount(),
-      totalTestimonials: await getTestimonialCount(),
+      totalTestimonials: testimonials.length,
+      // totalTestimonials: await getTestimonialCount(),
       recentOrders: 0, // Implement based on your order system
       monthlyRevenue: 0, // Implement based on your order system
     };

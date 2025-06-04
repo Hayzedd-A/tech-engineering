@@ -36,9 +36,9 @@ export async function getProducts(params: {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .lean();
 
   return {
+    success: true,
     data: products,
     pagination: {
       page,
@@ -52,16 +52,11 @@ export async function getProducts(params: {
 export async function getProductById(id: string): Promise<ProductType | null> {
   await connectDB();
 
-  const product = await Product.findById(id).lean();
+  const product = await Product.findById(id)
 
   if (!product) return null;
 
-  return {
-    ...product,
-    id: product._id.toString(),
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-  } as ProductType;
+  return product
 }
 
 export async function createProduct(
@@ -86,16 +81,11 @@ export async function updateProduct(
     id,
     { ...data, updatedAt: new Date() },
     { new: true, runValidators: true }
-  ).lean();
+  )
 
   if (!product) return null;
 
-  return {
-    ...product,
-    id: product._id.toString(),
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-  } as ProductType;
+  return product
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
@@ -112,17 +102,10 @@ export async function getFeaturedProducts(
 
   const products = await Product.find({ featured: true, inStock: true })
     .sort({ createdAt: -1 })
-    .limit(limit)
-    .lean();
+    .limit(limit);
 
-  return products.map((product) => ({
-    ...product,
-    id: product._id.toString(),
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-  })) as ProductType[];
+  return products
 }
-
 export async function getProductsByCategory(
   category: string,
   limit: number = 12
@@ -132,9 +115,8 @@ export async function getProductsByCategory(
   const products = await Product.find({ category, inStock: true })
     .sort({ createdAt: -1 })
     .limit(limit)
-    .lean();
 
-  return products as ProductType
+  return products 
 }
 
 export async function getProductCount(): Promise<number> {
