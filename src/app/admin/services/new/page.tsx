@@ -16,19 +16,19 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { Service } from "@/lib/types";
+import { ServiceType } from "@/lib/types";
 
 export default function NewServicePage() {
-  const [service, setService] = useState<Partial<Service>>({
+  const [service, setService] = useState<Partial<ServiceType>>({
     name: "",
     description: "",
     price: "",
     duration: "",
     category: "",
     image: "",
-    features: [],
-    active: true,
-    popular: false,
+    deviceTypes: [],
+    available: true,
+    featured: false,
   });
   const [features, setFeatures] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function NewServicePage() {
     try {
       const serviceData = {
         ...service,
-        features: features.split("\n").filter((feature) => feature.trim()),
+        deviceTypes: features.split("\n").filter((feature) => feature.trim()),
       };
 
       const response = await fetch("/api/admin/services", {
@@ -113,7 +113,7 @@ export default function NewServicePage() {
                         }))
                       }
                       required
-                      placeholder="$99 - $199"
+                      placeholder="₦99 - ₦199"
                     />
                   </div>
                   <div>
@@ -188,7 +188,7 @@ export default function NewServicePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Features (one per line)
+                    Device Types (one per line)
                   </label>
                   <Textarea
                     value={features}
@@ -227,7 +227,7 @@ export default function NewServicePage() {
                     Active Service
                   </label>
                   <Switch
-                    checked={service.active}
+                    checked={service.available}
                     onCheckedChange={(checked) =>
                       setService((prev) => ({ ...prev, active: checked }))
                     }
@@ -235,10 +235,10 @@ export default function NewServicePage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700">
-                    Popular Service
+                    Featured Service
                   </label>
                   <Switch
-                    checked={service.popular}
+                    checked={service.featured}
                     onCheckedChange={(checked) =>
                       setService((prev) => ({ ...prev, popular: checked }))
                     }
