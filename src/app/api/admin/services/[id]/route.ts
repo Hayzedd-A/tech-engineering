@@ -5,15 +5,16 @@ import {
   deleteService,
 } from "@/lib/database/services";
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const service = await getServiceById(params.id);
+    const { id } = await context.params;
+
+    const service = await getServiceById(id);
 
     if (!service) {
       return NextResponse.json(
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       data: service,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch service" },
       { status: 500 }
@@ -35,10 +36,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await context.params;
+
     const serviceData = await request.json();
-    const service = await updateService(params.id, serviceData);
+    const service = await updateService(id, serviceData);
 
     if (!service) {
       return NextResponse.json(
@@ -52,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       data: service,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return NextResponse.json(
       { success: false, error: "Failed to update service" },
       { status: 500 }
@@ -60,9 +66,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const success = await deleteService(params.id);
+    const { id } = await context.params;
+
+    const success = await deleteService(id);
 
     if (!success) {
       return NextResponse.json(
@@ -76,7 +87,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Service deleted successfully",
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return NextResponse.json(
       { success: false, error: "Failed to delete service" },
       { status: 500 }
