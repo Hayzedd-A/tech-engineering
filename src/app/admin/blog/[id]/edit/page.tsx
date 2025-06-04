@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import ImageUpload from '@/components/admin/ImageUpload';
-import { BlogPostType } from '@/lib/types';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ImageUpload from "@/components/admin/ImageUpload";
+import { BlogPostType } from "@/lib/types";
 
 interface EditBlogPostPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
@@ -23,15 +29,27 @@ export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
   const [tags, setTags] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [postId, setPostId] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
-    fetchPost();
-  }, [params.id]);
+    const initializeParams = async () => {
+      const resolvedParams = await params;
+      setPostId(resolvedParams.id);
+    };
+
+    initializeParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (postId) {
+      fetchPost();
+    }
+  }, [postId]);
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`/api/admin/blog/${params.id}`);
+      const response = await fetch(`/api/admin/blog/${postId}`);
       const result = await response.json();
 
       if (result.success) {
@@ -68,7 +86,7 @@ export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
             : post.publishedAt,
       };
 
-      const response = await fetch(`/api/admin/blog/${params.id}`, {
+      const response = await fetch(`/api/admin/blog/${postId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +102,7 @@ export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
         alert("Failed to update blog post: " + result.error);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       alert("Failed to update blog post");
     } finally {
       setSaving(false);
@@ -326,4 +344,3 @@ export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
     </div>
   );
 }
-

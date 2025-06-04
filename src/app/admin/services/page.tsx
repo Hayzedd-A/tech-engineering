@@ -6,11 +6,11 @@ import { Plus, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/admin/DataTable";
-import { Service } from "@/lib/types";
+import { ServiceType } from "@/lib/types";
 import Image from "next/image";
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<ServiceType[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -55,15 +55,15 @@ export default function ServicesPage() {
     setPagination((prev) => ({ ...prev, page }));
   };
 
-  const handleEdit = (service: Service) => {
-    router.push(`/admin/services/${service.id}/edit`);
+  const handleEdit = (service: ServiceType) => {
+    router.push(`/admin/services/${service._id}/edit`);
   };
 
-  const handleDelete = async (service: Service) => {
+  const handleDelete = async (service: ServiceType) => {
     if (!confirm("Are you sure you want to delete this service?")) return;
 
     try {
-      const response = await fetch(`/api/admin/services/${service.id}`, {
+      const response = await fetch(`/api/admin/services/${service._id}`, {
         method: "DELETE",
       });
 
@@ -77,7 +77,7 @@ export default function ServicesPage() {
 
   const columns = [
     {
-      key: "image" as keyof Service,
+      key: "image" as keyof ServiceType,
       label: "Image",
       render: (value: string) => (
         <div className="w-12 h-12 relative">
@@ -91,9 +91,9 @@ export default function ServicesPage() {
       ),
     },
     {
-      key: "name" as keyof Service,
+      key: "name" as keyof ServiceType,
       label: "Service Name",
-      render: (value: string, service: Service) => (
+      render: (value: string, service: ServiceType) => (
         <div>
           <div className="font-medium">{value}</div>
           <div className="text-sm text-gray-500">{service.category}</div>
@@ -101,15 +101,15 @@ export default function ServicesPage() {
       ),
     },
     {
-      key: "price" as keyof Service,
+      key: "price" as keyof ServiceType,
       label: "Price",
     },
     {
-      key: "duration" as keyof Service,
+      key: "duration" as keyof ServiceType,
       label: "Duration",
     },
     {
-      key: "active" as keyof Service,
+      key: "active" as keyof ServiceType,
       label: "Status",
       render: (value: boolean) => (
         <Badge variant={value ? "default" : "secondary"}>
@@ -118,7 +118,7 @@ export default function ServicesPage() {
       ),
     },
     {
-      key: "popular" as keyof Service,
+      key: "popular" as keyof ServiceType,
       label: "Popular",
       render: (value: boolean) => (
         <Badge variant={value ? "default" : "outline"}>

@@ -16,7 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { Service } from "@/lib/types";
+import { ServiceType } from "@/lib/types";
 
 interface EditServicePageProps {
   params: {
@@ -25,7 +25,7 @@ interface EditServicePageProps {
 }
 
 export default function EditServicePage({ params }: EditServicePageProps) {
-  const [service, setService] = useState<Service | null>(null);
+  const [service, setService] = useState<ServiceType | null>(null);
   const [features, setFeatures] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -289,7 +289,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                     Active Service
                   </label>
                   <Switch
-                    checked={service.active}
+                    checked={service.available}
                     onCheckedChange={(checked) =>
                       setService((prev) =>
                         prev ? { ...prev, active: checked } : null
@@ -299,10 +299,10 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700">
-                    Popular Service
+                    Featured Service
                   </label>
                   <Switch
-                    checked={service.popular}
+                    checked={service.featured}
                     onCheckedChange={(checked) =>
                       setService((prev) =>
                         prev ? { ...prev, popular: checked } : null

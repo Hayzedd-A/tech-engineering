@@ -31,7 +31,7 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
 }
 
-export default function DataTable<T extends { id: string }>({
+export default function DataTable<T extends { _id: string }>({
   data,
   columns,
   pagination,
@@ -82,7 +82,7 @@ export default function DataTable<T extends { id: string }>({
             </thead>
             <tbody className="divide-y divide-gray-200">
               {data.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item._id} className="hover:bg-gray-50">
                   {columns.map((column) => (
                     <td
                       key={String(column.key)}
