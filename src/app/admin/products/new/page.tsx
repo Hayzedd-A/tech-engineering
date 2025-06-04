@@ -23,12 +23,12 @@ export default function NewProductPage() {
     name: "",
     brand: "",
     price: 0,
-    condition: "new",
+    condition: "New",
     image: "",
     description: "",
     specifications: [],
     inStock: true,
-    quantity: 0,
+    stockQuantity: 0,
     category: "",
     featured: false,
   });
@@ -172,7 +172,7 @@ export default function NewProductPage() {
                     </label>
                     <Input
                       type="number"
-                      value={product.quantity}
+                      value={product.stockQuantity}
                       onChange={(e) =>
                         setProduct((prev) => ({
                           ...prev,
