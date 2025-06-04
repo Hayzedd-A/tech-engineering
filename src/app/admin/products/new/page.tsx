@@ -160,9 +160,9 @@ export default function NewProductPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="used">Used</SelectItem>
-                        <SelectItem value="refurbished">Refurbished</SelectItem>
+                        <SelectItem value="New">New</SelectItem>
+                        <SelectItem value="Used">Used</SelectItem>
+                        <SelectItem value="Refurbished">Refurbished</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
