@@ -56,14 +56,14 @@ export default function BlogPage() {
   };
 
   const handleEdit = (post: BlogPostType) => {
-    router.push(`/admin/blog/${post.id}/edit`);
+    router.push(`/admin/blog/${post._id}/edit`);
   };
 
   const handleDelete = async (post: BlogPostType) => {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
 
     try {
-      const response = await fetch(`/api/admin/blog/${post.id}`, {
+      const response = await fetch(`/api/admin/blog/${post._id}`, {
         method: "DELETE",
       });
 

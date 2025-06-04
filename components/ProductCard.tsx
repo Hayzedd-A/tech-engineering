@@ -11,7 +11,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
 
   return (
-    <Link href={`/shop/${product.id}`}>
+    <Link href={`/shop/${product._id}`}>
       <Card className="group hover:shadow-lg transition-shadow duration-300 cursor-pointer">
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
           <Image

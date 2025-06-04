@@ -176,7 +176,6 @@ export interface PaginatedResponse<T> {
 
 export interface ProductType {
   _id: string;
-  id: string;
   name: string;
   description: string;
   price: number;

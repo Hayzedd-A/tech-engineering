@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { BlogPostType } from "@/lib/types";
 
 interface BlogCardProps {
@@ -25,12 +25,12 @@ export default function BlogCard({ post }: BlogCardProps) {
         <div className="flex items-center text-sm text-gray-500 mb-2 space-x-4">
           <div className="flex items-center">
             <Calendar className="h-4 w-4 mr-1" />
-            {post.date}
+            {post.updatedAt + ""}
           </div>
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <Clock className="h-4 w-4 mr-1" />
             {post.readTime}
-          </div>
+          </div> */}
         </div>
         <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
       </CardHeader>
@@ -47,7 +47,7 @@ export default function BlogCard({ post }: BlogCardProps) {
             </span>
           ))}
         </div>
-        <Link href={`/blog/${post.id}`}>
+        <Link href={`/blog/${post._id}`}>
           <Button variant="outline" className="w-full">
             Read More
           </Button>
