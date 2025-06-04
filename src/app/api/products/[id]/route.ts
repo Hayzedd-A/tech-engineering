@@ -3,10 +3,12 @@ import { getProductById } from "@/lib/database/products";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const product = await getProductById(params.id);
+    const { id } = await context.params;
+
+    const product = await getProductById(id);
 
     if (!product) {
       return NextResponse.json(
