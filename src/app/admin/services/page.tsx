@@ -90,7 +90,6 @@ export default function ServicesPage() {
         </div>
       ),
     },
-    
     {
       key: "name" as keyof ServiceType,
       label: "Service Name",
