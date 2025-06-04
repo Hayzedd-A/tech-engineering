@@ -4,7 +4,6 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   price: number;
-  originalPrice?: number;
   category: string;
   brand: string;
   image: string;
@@ -35,10 +34,6 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       required: [true, "Product price is required"],
       min: [0, "Price cannot be negative"],
-    },
-    originalPrice: {
-      type: Number,
-      min: [0, "Original price cannot be negative"],
     },
     category: {
       type: String,

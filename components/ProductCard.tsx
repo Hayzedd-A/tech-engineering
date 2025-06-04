@@ -9,9 +9,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
 
   return (
     <Link href={`/shop/${product.id}`}>
@@ -26,11 +23,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.featured && (
             <Badge className="absolute top-2 left-2 bg-blue-600">
               Featured
-            </Badge>
-          )}
-          {discountPercentage > 0 && (
-            <Badge className="absolute top-2 right-2 bg-red-600">
-              -{discountPercentage}%
             </Badge>
           )}
           {!product.inStock && (
@@ -62,11 +54,6 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <span className="text-2xl font-bold text-blue-600">
                   ${product.price.toLocaleString()}
                 </span>
-                {product.originalPrice && (
-                  <span className="text-lg text-gray-500 line-through">
-                    ${product.originalPrice.toLocaleString()}
-                  </span>
-                )}
               </div>
               {product.stockQuantity > 0 && (
                 <Badge variant="outline" className="text-xs">

@@ -66,11 +66,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  const discountPercentage = product.originalPrice
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
-    : 0;
 
   const images =
     product.images && product.images.length > 0
@@ -101,11 +96,7 @@ export default function ProductDetailPage() {
                   Featured
                 </Badge>
               )}
-              {discountPercentage > 0 && (
-                <Badge className="absolute top-4 right-4 bg-red-600">
-                  -{discountPercentage}%
-                </Badge>
-              )}
+              
             </div>
 
             {images.length > 1 && (
@@ -152,11 +143,6 @@ export default function ProductDetailPage() {
                 <span className="text-4xl font-bold text-blue-600">
                   ${product.price.toLocaleString()}
                 </span>
-                {product.originalPrice && (
-                  <span className="text-2xl text-gray-500 line-through">
-                    ${product.originalPrice.toLocaleString()}
-                  </span>
-                )}
               </div>
 
               <div className="flex items-center space-x-4">
