@@ -1,117 +1,144 @@
-import { Product, PaginatedResponse } from "@/lib/types";
-import { products as mockProducts } from "@/lib/data";
+import connectDB from "@/lib/connection";
+import Product from "@/models/Products";
+import { ProductType as ProductType, PaginatedResponse } from "@/lib/types";
 
-// Mock database - replace with actual database implementation
-const products: Product[] = mockProducts.map((product, index) => ({
-  ...product,
-  id: (index + 1).toString(),
-  quantity: Math.floor(Math.random() * 50) + 1,
-  featured: Math.random() > 0.7,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-}));
-
-interface GetProductsParams {
+export async function getProducts(params: {
   page: number;
   limit: number;
   search?: string;
   category?: string;
-}
+  featured?: boolean;
+}): Promise<PaginatedResponse<ProductType>> {
+  await connectDB();
 
-export async function getProducts(
-  params: GetProductsParams
-): Promise<PaginatedResponse<Product>> {
-  let filteredProducts = [...products];
+  const { page, limit, search, category, featured } = params;
 
-  // Apply search filter
-  if (params.search) {
-    const searchLower = params.search.toLowerCase();
-    filteredProducts = filteredProducts.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchLower) ||
-        product.brand.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower)
-    );
+  // Build query
+  const query: any = {};
+
+  if (search) {
+    query.$text = { $search: search };
   }
 
-  // Apply category filter
-  if (params.category) {
-    filteredProducts = filteredProducts.filter(
-      (product) => product.category === params.category
-    );
+  if (category) {
+    query.category = category;
   }
 
-  // Calculate pagination
-  const total = filteredProducts.length;
-  const totalPages = Math.ceil(total / params.limit);
-  const startIndex = (params.page - 1) * params.limit;
-  const endIndex = startIndex + params.limit;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+  if (featured !== undefined) {
+    query.featured = featured;
+  }
+
+  const total = await Product.countDocuments(query);
+  const totalPages = Math.ceil(total / limit);
+  const skip = (page - 1) * limit;
+
+  const products = await Product.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
   return {
-    data: paginatedProducts,
+    data: products,
     pagination: {
-      page: params.page,
-      limit: params.limit,
+      page,
+      limit,
       total,
       totalPages,
     },
   };
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
-  return products.find((product) => product.id === id) || null;
+export async function getProductById(id: string): Promise<ProductType | null> {
+  await connectDB();
+
+  const product = await Product.findById(id).lean();
+
+  if (!product) return null;
+
+  return {
+    ...product,
+    id: product._id.toString(),
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+  } as ProductType;
 }
 
 export async function createProduct(
-  productData: Partial<Product>
-): Promise<Product> {
-  const newProduct: Product = {
-    id: (products.length + 1).toString(),
-    name: productData.name || "",
-    brand: productData.brand || "",
-    price: productData.price || 0,
-    condition: productData.condition || "new",
-    image: productData.image || "",
-    images: productData.images || [],
-    description: productData.description || "",
-    specifications: productData.specifications || [],
-    inStock: productData.inStock ?? true,
-    quantity: productData.quantity || 0,
-    category: productData.category || "",
-    featured: productData.featured || false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  data: Partial<ProductType>
+): Promise<ProductType> {
+  await connectDB();
 
-  products.push(newProduct);
-  return newProduct;
+  const product = await Product.create(data);
+
+  return {
+    ...product.toObject(),
+  } as ProductType;
 }
 
 export async function updateProduct(
   id: string,
-  productData: Partial<Product>
-): Promise<Product | null> {
-  const index = products.findIndex((product) => product.id === id);
-  if (index === -1) return null;
+  data: Partial<ProductType>
+): Promise<ProductType | null> {
+  await connectDB();
 
-  products[index] = {
-    ...products[index],
-    ...productData,
-    updatedAt: new Date().toISOString(),
-  };
+  const product = await Product.findByIdAndUpdate(
+    id,
+    { ...data, updatedAt: new Date() },
+    { new: true, runValidators: true }
+  ).lean();
 
-  return products[index];
+  if (!product) return null;
+
+  return {
+    ...product,
+    id: product._id.toString(),
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+  } as ProductType;
 }
 
 export async function deleteProduct(id: string): Promise<boolean> {
-  const index = products.findIndex((product) => product.id === id);
-  if (index === -1) return false;
+  await connectDB();
 
-  products.splice(index, 1);
-  return true;
+  const result = await Product.findByIdAndDelete(id);
+  return !!result;
+}
+
+export async function getFeaturedProducts(
+  limit: number = 8
+): Promise<ProductType[]> {
+  await connectDB();
+
+  const products = await Product.find({ featured: true, inStock: true })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  return products.map((product) => ({
+    ...product,
+    id: product._id.toString(),
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+  })) as ProductType[];
+}
+
+export async function getProductsByCategory(
+  category: string,
+  limit: number = 12
+): Promise<ProductType[]> {
+  await connectDB();
+
+  const products = await Product.find({ category, inStock: true })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  return products as ProductType
 }
 
 export async function getProductCount(): Promise<number> {
-  return products.length;
+  await connectDB();
+  const count = await Product.countDocuments({})
+  return count
 }

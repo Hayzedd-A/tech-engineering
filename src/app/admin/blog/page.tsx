@@ -6,11 +6,11 @@ import { Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import DataTable from '@/components/admin/DataTable';
-import { BlogPost } from '@/lib/types';
+import { BlogPostType } from '@/lib/types';
 import Image from 'next/image';
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPostType[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -55,11 +55,11 @@ export default function BlogPage() {
     setPagination((prev) => ({ ...prev, page }));
   };
 
-  const handleEdit = (post: BlogPost) => {
+  const handleEdit = (post: BlogPostType) => {
     router.push(`/admin/blog/${post.id}/edit`);
   };
 
-  const handleDelete = async (post: BlogPost) => {
+  const handleDelete = async (post: BlogPostType) => {
     if (!confirm("Are you sure you want to delete this blog post?")) return;
 
     try {
@@ -77,7 +77,7 @@ export default function BlogPage() {
 
   const columns = [
     {
-      key: "image" as keyof BlogPost,
+      key: "image" as keyof BlogPostType,
       label: "Image",
       render: (value: string) => (
         <div className="w-12 h-12 relative">
@@ -91,9 +91,9 @@ export default function BlogPage() {
       ),
     },
     {
-      key: "title" as keyof BlogPost,
+      key: "title" as keyof BlogPostType,
       label: "Title",
-      render: (value: string, post: BlogPost) => (
+      render: (value: string, post: BlogPostType) => (
         <div>
           <div className="font-medium">{value}</div>
           <div className="text-sm text-gray-500">{post.category}</div>
@@ -101,18 +101,18 @@ export default function BlogPage() {
       ),
     },
     {
-      key: "author" as keyof BlogPost,
+      key: "author" as keyof BlogPostType,
       label: "Author",
     },
     {
-      key: "publishedAt" as keyof BlogPost,
+      key: "publishedAt" as keyof BlogPostType,
       label: "Published",
       render: (value: string) => (
         <span className="text-sm">{new Date(value).toLocaleDateString()}</span>
       ),
     },
     {
-      key: "published" as keyof BlogPost,
+      key: "published" as keyof BlogPostType,
       label: "Status",
       render: (value: boolean) => (
         <Badge variant={value ? "default" : "secondary"}>
@@ -121,7 +121,7 @@ export default function BlogPage() {
       ),
     },
     {
-      key: "featured" as keyof BlogPost,
+      key: "featured" as keyof BlogPostType,
       label: "Featured",
       render: (value: boolean) => (
         <Badge variant={value ? "default" : "outline"}>

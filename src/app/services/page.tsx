@@ -1,7 +1,6 @@
-import ServiceCard from "@/components/ServiceCard";
-import { services } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Allservices from "@/components/Allservices";
 
 export const metadata = {
   title: "Repair Services - TechFix Pro",
@@ -25,11 +24,7 @@ export default function ServicesPage() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {services.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </div>
+        <Allservices/>
 
         {/* Additional Info */}
         <div className="bg-blue-50 rounded-lg p-8 mb-16">

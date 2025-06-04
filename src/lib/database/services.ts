@@ -1,102 +1,131 @@
-import { Service, PaginatedResponse } from "@/lib/types";
-import { services as mockServices } from "@/lib/data";
+// import connectDB from "./connection";
+import connectDB from "../connection";
+import Service from "@/models/Services";
+import { ServiceType, PaginatedResponse } from "@/lib/types";
 
-const services: Service[] = mockServices.map((service, index) => ({
-  ...service,
-  id: (index + 1).toString(),
-  active: true,
-  popular: Math.random() > 0.6,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-}));
-
-interface GetServicesParams {
+type QueryType = {
+  $text?: { $search: string };
+  category?: string;
+  featured?: boolean;
+};
+export async function getServices(params: {
   page: number;
   limit: number;
   search?: string;
-}
+  category?: string;
+  featured?: boolean;
+}): Promise<PaginatedResponse<ServiceType> | Error | null> {
+  try {
+    await connectDB();
+    console.log("incomming request to get")
 
-export async function getServices(
-  params: GetServicesParams
-): Promise<PaginatedResponse<Service>> {
-  let filteredServices = [...services];
+    const { page, limit, search, category, featured } = params;
 
-  if (params.search) {
-    const searchLower = params.search.toLowerCase();
-    filteredServices = filteredServices.filter(
-      (service) =>
-        service.name.toLowerCase().includes(searchLower) ||
-        service.description.toLowerCase().includes(searchLower)
-    );
+    const query: QueryType = {};
+
+    if (search) {
+      query.$text = { $search: search };
+    }
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (featured !== undefined) {
+      query.featured = featured;
+    }
+
+    const total = await Service.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+
+    const services = await Service.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    return {
+      data: services,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error);
+      return error;
+    } else {
+      return null;
+    }
   }
-
-  const total = filteredServices.length;
-  const totalPages = Math.ceil(total / params.limit);
-  const startIndex = (params.page - 1) * params.limit;
-  const endIndex = startIndex + params.limit;
-  const paginatedServices = filteredServices.slice(startIndex, endIndex);
-
-  return {
-    data: paginatedServices,
-    pagination: {
-      page: params.page,
-      limit: params.limit,
-      total,
-      totalPages,
-    },
-  };
 }
 
-export async function getServiceById(id: string): Promise<Service | null> {
-  return services.find((service) => service.id === id) || null;
+export async function getServiceById(id: string): Promise<ServiceType | null> {
+  await connectDB();
+
+  const service = await Service.findById(id)
+
+  if (!service) return null;
+
+  return service
 }
 
 export async function createService(
-  serviceData: Partial<Service>
-): Promise<Service> {
-  const newService: Service = {
-    id: (services.length + 1).toString(),
-    name: serviceData.name || "",
-    description: serviceData.description || "",
-    price: serviceData.price || "",
-    duration: serviceData.duration || "",
-    image: serviceData.image || "",
-    features: serviceData.features || [],
-    category: serviceData.category || "",
-    active: serviceData.active ?? true,
-    popular: serviceData.popular || false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  data: Partial<ServiceType>
+): Promise<ServiceType> {
+  await connectDB();
 
-  services.push(newService);
-  return newService;
+  const service = await Service.create(data);
+
+  return {
+    ...service.toObject(),
+    id: service._id.toString(),
+    createdAt: service.createdAt.toISOString(),
+    updatedAt: service.updatedAt.toISOString(),
+  } as ServiceType;
 }
 
 export async function updateService(
   id: string,
-  serviceData: Partial<Service>
-): Promise<Service | null> {
-  const index = services.findIndex((service) => service.id === id);
-  if (index === -1) return null;
+  data: Partial<ServiceType>
+): Promise<ServiceType | null> {
+  await connectDB();
 
-  services[index] = {
-    ...services[index],
-    ...serviceData,
-    updatedAt: new Date().toISOString(),
-  };
+  const service = await Service.findByIdAndUpdate(
+    id,
+    { ...data, updatedAt: new Date() },
+    { new: true, runValidators: true }
+  )
 
-  return services[index];
+  if (!service) return null;
+
+  return service
 }
 
 export async function deleteService(id: string): Promise<boolean> {
-  const index = services.findIndex((service) => service.id === id);
-  if (index === -1) return false;
+  await connectDB();
 
-  services.splice(index, 1);
-  return true;
+  const result = await Service.findByIdAndDelete(id);
+  return !!result;
+}
+
+export async function getFeaturedServices(
+  limit: number = 6
+): Promise<ServiceType[]> {
+  await connectDB();
+
+  const services = await Service.find({ featured: true, available: true })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+
+  return services
 }
 
 export async function getServiceCount(): Promise<number> {
-  return services.length;
+  await connectDB();
+  const count = await Service.countDocuments({});
+  return count;
 }

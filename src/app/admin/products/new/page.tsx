@@ -16,10 +16,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { Product } from "@/lib/types";
+import { ProductType } from "@/lib/types";
 
 export default function NewProductPage() {
-  const [product, setProduct] = useState<Partial<Product>>({
+  const [product, setProduct] = useState<Partial<ProductType>>({
     name: "",
     brand: "",
     price: 0,

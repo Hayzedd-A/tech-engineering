@@ -1,19 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { products } from "@/lib/data";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, Search } from "lucide-react";
+import { PaginatedResponse, ProductType } from "@/lib/types";
 
 export default function ShopPage() {
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
-  const [selectedCondition, setSelectedCondition] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0,
+  });
 
-  const brands = ["all", ...Array.from(new Set(products.map((p) => p.brand)))];
-  const conditions = ["all", "new", "refurbished", "used"];
+  // Available filter options
+  const categories = [
+    "all",
+    "smartphones",
+    "tablets",
+    "laptops",
+    "accessories",
+    "parts",
+  ];
+  const [brands, setBrands] = useState<string[]>(["all"]);
   const priceRanges = [
     { label: "All Prices", value: "all" },
     { label: "Under $300", value: "0-300" },
@@ -22,33 +42,99 @@ export default function ShopPage() {
     { label: "Over $900", value: "900+" },
   ];
 
-  const applyFilters = () => {
-    let filtered = products;
-
-    if (selectedBrand !== "all") {
-      filtered = filtered.filter((p) => p.brand === selectedBrand);
-    }
-
-    if (selectedCondition !== "all") {
-      filtered = filtered.filter((p) => p.condition === selectedCondition);
-    }
-
-    if (priceRange !== "all") {
-      const [min, max] = priceRange.split("-").map((p) => p.replace("+", ""));
-      filtered = filtered.filter((p) => {
-        if (priceRange === "900+") return p.price >= 900;
-        return p.price >= parseInt(min) && p.price <= parseInt(max);
+  // Fetch products from API
+  const fetchProducts = async (page: number = 1) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "12",
       });
-    }
 
-    setFilteredProducts(filtered);
+      if (searchTerm) params.append("search", searchTerm);
+      if (selectedCategory !== "all")
+        params.append("category", selectedCategory);
+
+      const response = await fetch(`/api/products?${params.toString()}`);
+      const result: PaginatedResponse<ProductType> = await response.json();
+
+      if (result.success) {
+        let filteredProducts = result.data;
+
+        // Apply client-side filters (brand and price)
+        if (selectedBrand !== "all") {
+          filteredProducts = filteredProducts.filter(
+            (p) => p.brand === selectedBrand
+          );
+        }
+
+        if (priceRange !== "all") {
+          const [min, max] = priceRange
+            .split("-")
+            .map((p) => p.replace("+", ""));
+          filteredProducts = filteredProducts.filter((p) => {
+            if (priceRange === "900+") return p.price >= 900;
+            return p.price >= parseInt(min) && p.price <= parseInt(max);
+          });
+        }
+
+        setProducts(filteredProducts);
+        setPagination(result.pagination);
+
+        // Extract unique brands from all products for filter options
+        const uniqueBrands = [
+          "all",
+          ...Array.from(new Set(result.data.map((p) => p.brand))),
+        ];
+        setBrands(uniqueBrands);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Initial load
+  useEffect(() => {
+    fetchProducts(1);
+  }, []);
+
+  // Refetch when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchProducts(1);
+  }, [searchTerm, selectedCategory]);
+
+  // Refetch when page changes
+  useEffect(() => {
+    if (currentPage > 1) {
+      fetchProducts(currentPage);
+    }
+  }, [currentPage]);
+
+  // Apply client-side filters when they change
+  useEffect(() => {
+    fetchProducts(currentPage);
+  }, [selectedBrand, priceRange]);
+
   const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("all");
     setSelectedBrand("all");
-    setSelectedCondition("all");
     setPriceRange("all");
-    setFilteredProducts(products);
+    setCurrentPage(1);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    fetchProducts(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -69,15 +155,57 @@ export default function ShopPage() {
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Filters</h3>
 
+                {/* Search Filter */}
+                <div className="mb-6">
+                  <Label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search
+                  </Label>
+                  <form onSubmit={handleSearch} className="flex gap-2">
+                    <Input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button type="submit" size="sm" disabled={loading}>
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </form>
+                </div>
+
+                {/* Category Filter */}
+                <div className="mb-6">
+                  <Label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </Label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    disabled={loading}
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category === "all"
+                          ? "All Categories"
+                          : category.charAt(0).toUpperCase() +
+                            category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Brand Filter */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Label className="block text-sm font-medium text-gray-700 mb-2">
                     Brand
-                  </label>
+                  </Label>
                   <select
                     value={selectedBrand}
                     onChange={(e) => setSelectedBrand(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
+                    disabled={loading}
                   >
                     {brands.map((brand) => (
                       <option key={brand} value={brand}>
@@ -87,36 +215,16 @@ export default function ShopPage() {
                   </select>
                 </div>
 
-                {/* Condition Filter */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Condition
-                  </label>
-                  <select
-                    value={selectedCondition}
-                    onChange={(e) => setSelectedCondition(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                  >
-                    {conditions.map((condition) => (
-                      <option key={condition} value={condition}>
-                        {condition === "all"
-                          ? "All Conditions"
-                          : condition.charAt(0).toUpperCase() +
-                            condition.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 {/* Price Filter */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Label className="block text-sm font-medium text-gray-700 mb-2">
                     Price Range
-                  </label>
+                  </Label>
                   <select
                     value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
+                    disabled={loading}
                   >
                     {priceRanges.map((range) => (
                       <option key={range.value} value={range.value}>
@@ -127,13 +235,11 @@ export default function ShopPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Button onClick={applyFilters} className="w-full">
-                    Apply Filters
-                  </Button>
                   <Button
                     onClick={resetFilters}
                     variant="outline"
                     className="w-full"
+                    disabled={loading}
                   >
                     Reset Filters
                   </Button>
@@ -146,16 +252,63 @@ export default function ShopPage() {
           <div className="lg:col-span-3">
             <div className="flex justify-between items-center mb-6">
               <p className="text-gray-600">
-                Showing {filteredProducts.length} of {products.length} products
+                {loading
+                  ? "Loading products..."
+                  : `Showing ${products.length} of ${pagination.total} products`}
               </p>
             </div>
 
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading products...</span>
               </div>
+            ) : products.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {products.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="flex justify-center items-center space-x-2 mt-8">
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1 || loading}
+                    >
+                      Previous
+                    </Button>
+
+                    {Array.from(
+                      { length: pagination.totalPages },
+                      (_, i) => i + 1
+                    ).map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        onClick={() => handlePageChange(page)}
+                        disabled={loading}
+                        className="w-10"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={
+                        currentPage === pagination.totalPages || loading
+                      }
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">

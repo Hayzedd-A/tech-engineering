@@ -16,10 +16,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { BlogPost } from "@/lib/types";
+import { BlogPostType } from "@/lib/types";
 
 export default function NewBlogPostPage() {
-  const [post, setPost] = useState<Partial<BlogPost>>({
+  const [post, setPost] = useState<Partial<BlogPostType>>({
     title: "",
     excerpt: "",
     content: "",

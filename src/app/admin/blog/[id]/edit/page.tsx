@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ImageUpload from '@/components/admin/ImageUpload';
-import { BlogPost } from '@/lib/types';
+import { BlogPostType } from '@/lib/types';
 
 interface EditBlogPostPageProps {
   params: {
@@ -19,7 +19,7 @@ interface EditBlogPostPageProps {
 }
 
 export default function EditBlogPostPage({ params }: EditBlogPostPageProps) {
-  const [post, setPost] = useState<BlogPost | null>(null);
+  const [post, setPost] = useState<BlogPostType | null>(null);
   const [tags, setTags] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

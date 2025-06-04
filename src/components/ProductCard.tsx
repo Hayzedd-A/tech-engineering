@@ -1,69 +1,84 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Product } from "@/lib/data";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ProductType } from "@/lib/types";
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductType;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const getConditionColor = (condition: string) => {
-    switch (condition) {
-      case "new":
-        return "bg-green-100 text-green-800";
-      case "refurbished":
-        return "bg-blue-100 text-blue-800";
-      case "used":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  const discountPercentage = product.originalPrice
+    ? Math.round(
+        ((product.originalPrice - product.price) / product.originalPrice) * 100
+      )
+    : 0;
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="p-4">
-        <div className="relative h-48 mb-4">
+    <Link href={`/shop/${product._id}`}>
+      <Card className="group hover:shadow-lg  transition-shadow duration-300 cursor-pointer">
+        <div className="relative aspect-square overflow-hidden rounded-t-lg">
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover rounded-md"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          {product.featured && (
+            <Badge className="absolute top-2 left-2 bg-blue-600">
+              Featured
+            </Badge>
+          )}
+          {discountPercentage > 0 && (
+            <Badge className="absolute top-2 right-2 bg-red-600">
+              -{discountPercentage}%
+            </Badge>
+          )}
+          {!product.inStock && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <Badge variant="destructive" className="text-lg">
+                Out of Stock
+              </Badge>
+            </div>
+          )}
         </div>
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{product.name}</CardTitle>
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getConditionColor(
-              product.condition
-            )}`}
-          >
-            {product.condition}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow p-4 pt-0">
-        <p className="text-gray-600 mb-2">{product.description}</p>
-        <p className="text-2xl font-bold text-blue-600">${product.price}</p>
-      </CardContent>
-      <CardFooter className="p-4 pt-0 space-y-2 flex gap-2">
-        <Link href={`/shop/${product.id}`} className="w-full m-0">
-          <Button variant="outline" className="w-full">
-            View Details
-          </Button>
-        </Link>
-        <Link href="/contact" className="w-full">
-          <Button className="w-full">Contact to Buy</Button>
-        </Link>
-      </CardFooter>
-    </Card>
+        <CardContent className="p-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className="text-xs">
+                {product.brand}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {product.category}
+              </Badge>
+            </div>
+            <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
+              {product.name}
+            </h3>
+            <p className="text-gray-600 text-sm line-clamp-2">
+              {product.description}
+            </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl font-bold text-blue-600">
+                  ${product.price.toLocaleString()}
+                </span>
+                {product.originalPrice && (
+                  <span className="text-lg text-gray-500 line-through">
+                    ${product.originalPrice.toLocaleString()}
+                  </span>
+                )}
+              </div>
+              {product.stockQuantity > 0 && (
+                <Badge variant="outline" className="text-xs">
+                  {product.stockQuantity} left
+                </Badge>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

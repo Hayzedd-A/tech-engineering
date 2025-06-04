@@ -11,6 +11,7 @@ export interface IProduct extends Document {
   images: string[];
   inStock: boolean;
   stockQuantity: number;
+  condition: "New" | "Used" | "Refurbished";
   featured: boolean;
   specifications: Record<string, any>;
   createdAt: Date;
@@ -60,6 +61,10 @@ const ProductSchema = new Schema<IProduct>(
     inStock: {
       type: Boolean,
       default: true,
+    },
+    condition: {
+      type: String,
+      enum: ["New", "Used", "Refurbished"]
     },
     stockQuantity: {
       type: Number,

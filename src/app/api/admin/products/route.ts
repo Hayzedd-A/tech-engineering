@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-// import { Product, ApiResponse, PaginatedResponse } from "@/lib/types";
 import {
   getProducts,
   createProduct,
-  // updateProduct,
-  // deleteProduct,
 } from "@/lib/database/products";
 
 export async function GET(request: NextRequest) {

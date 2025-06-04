@@ -1,9 +1,10 @@
+import { ServiceType } from "@/lib/types";
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IService extends Document {
   name: string;
   description: string;
-  price: number;
+  price: string;
   duration: string;
   category: string;
   image: string;
@@ -15,7 +16,7 @@ export interface IService extends Document {
   updatedAt: Date;
 }
 
-const ServiceSchema = new Schema<IService>(
+const ServiceSchema = new Schema<ServiceType>(
   {
     name: {
       type: String,
@@ -29,7 +30,7 @@ const ServiceSchema = new Schema<IService>(
       maxlength: [2000, "Description cannot exceed 2000 characters"],
     },
     price: {
-      type: Number,
+      type: String,
       required: [true, "Service price is required"],
       min: [0, "Price cannot be negative"],
     },
@@ -44,8 +45,9 @@ const ServiceSchema = new Schema<IService>(
         "screen-repair",
         "battery-replacement",
         "water-damage",
-        "software-repair",
+        "software-issues",
         "data-recovery",
+        "hardware-issues",
         "general-repair",
       ],
     },
@@ -90,4 +92,4 @@ ServiceSchema.index({ featured: 1 });
 ServiceSchema.index({ available: 1 });
 
 export default mongoose.models.Service ||
-  mongoose.model<IService>("Service", ServiceSchema);
+  mongoose.model<ServiceType>("Service", ServiceSchema);

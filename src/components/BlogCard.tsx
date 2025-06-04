@@ -3,10 +3,10 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock } from "lucide-react";
-import { BlogPost } from "@/lib/types";
+import { BlogPostType } from "@/lib/types";
 
 interface BlogCardProps {
-  post: BlogPost;
+  post: BlogPostType;
 }
 
 export default function BlogCard({ post }: BlogCardProps) {

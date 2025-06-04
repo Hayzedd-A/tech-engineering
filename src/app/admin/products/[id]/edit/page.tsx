@@ -16,7 +16,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { Product } from "@/lib/types";
+import { ProductType } from "@/lib/types";
 
 interface EditProductPageProps {
   params: {
@@ -25,7 +25,7 @@ interface EditProductPageProps {
 }
 
 export default function EditProductPage({ params }: EditProductPageProps) {
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<ProductType | null>(null);
   const [specifications, setSpecifications] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -212,9 +212,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="used">Used</SelectItem>
-                        <SelectItem value="refurbished">Refurbished</SelectItem>
+                        <SelectItem value="New">New</SelectItem>
+                        <SelectItem value="Used">Used</SelectItem>
+                        <SelectItem value="Refurbished">Refurbished</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -224,11 +224,11 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     </label>
                     <Input
                       type="number"
-                      value={product.quantity}
+                      value={product.stockQuantity}
                       onChange={(e) =>
                         setProduct((prev) =>
                           prev
-                            ? { ...prev, quantity: parseInt(e.target.value) }
+                            ? { ...prev, stockQuantity: parseInt(e.target.value) }
                             : null
                         )
                       }

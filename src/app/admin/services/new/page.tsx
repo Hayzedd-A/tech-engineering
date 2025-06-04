@@ -158,8 +158,8 @@ export default function NewServicePage() {
                         <SelectItem value="software-issues">
                           Software Issues
                         </SelectItem>
-                        <SelectItem value="hardware-repair">
-                          Hardware Repair
+                        <SelectItem value="hardware-issues">
+                          Hardware issues
                         </SelectItem>
                         <SelectItem value="data-recovery">
                           Data Recovery

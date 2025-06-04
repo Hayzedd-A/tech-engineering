@@ -216,11 +216,14 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                         <SelectItem value="software-issues">
                           Software Issues
                         </SelectItem>
-                        <SelectItem value="hardware-repair">
+                        <SelectItem value="hardware-issues">
                           Hardware Repair
                         </SelectItem>
                         <SelectItem value="data-recovery">
                           Data Recovery
+                        </SelectItem>
+                        <SelectItem value="general-issue">
+                          General Issue
                         </SelectItem>
                       </SelectContent>
                     </Select>
