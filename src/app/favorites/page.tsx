@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { ProductType } from "@/lib/types";
-import { Loader2, Heart, ShoppingCart } from "lucide-react";
+import { Loader2, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -154,11 +154,11 @@ export default function FavoritesPage() {
                             View Details
                           </Button>
                         </Link>
-                        {product.inStock && (
+                        {/* {product.inStock && (
                           <Button size="sm" className="px-3">
                             <ShoppingCart className="h-4 w-4" />
                           </Button>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </CardContent>

@@ -52,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-bold text-blue-600">
-                  ${product.price.toLocaleString()}
+                  ₦{product.price.toLocaleString()}
                 </span>
               </div>
               {product.stockQuantity > 0 && (
