@@ -96,7 +96,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 TechFix Pro. All rights reserved.
+            © {`${new Date().getFullYear()}`} TechFix Pro. All rights reserved.
           </p>
         </div>
       </div>

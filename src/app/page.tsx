@@ -65,7 +65,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-96 lg:h-full">
               <Image
-                src="https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600"
+                src="/images/phone-repair.jpeg"
                 alt="Phone repair service"
                 fill
                 className="object-cover rounded-lg shadow-2xl border border-white/20"
@@ -139,7 +139,7 @@ export default function HomePage() {
                 <Link href="/services">
                   <Button
                     variant="outline"
-                    className="border-white text-white hover:bg-white hover:text-blue-600"
+                    className="border-white bg-blue-600 text-white hover:bg-white hover:text-blue-400"
                   >
                     View All Services
                   </Button>
@@ -156,7 +156,7 @@ export default function HomePage() {
                 <Link href="/shop">
                   <Button
                     variant="outline"
-                    className="border-white text-white hover:bg-white hover:text-green-600"
+                    className="border-white text-white bg-green-600 hover:bg-white hover:text-green-600"
                   >
                     Browse Products
                   </Button>
@@ -208,7 +208,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-blue-600"
+                className="border-white bg-blue-500 text-white hover:bg-white hover:text-blue-600"
               >
                 Call Now: (555) 123-4567
               </Button>

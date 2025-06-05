@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Menu, X, Phone, Wrench, Heart } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { getFavoriteCount, isClient } = useFavorites();
+  
+  const favoriteCount = getFavoriteCount();
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -42,8 +47,24 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* CTA Button */}
+          {/* CTA Button and Favorites */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Favorites Button */}
+            <Link href="/favorites">
+              <Button variant="ghost" size="sm" className="relative">
+                <Heart className="h-5 w-5" />
+                {isClient && favoriteCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {favoriteCount > 99 ? '99+' : favoriteCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+            
+            {/* Book Repair Button */}
             <Link href="/contact">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Phone className="h-4 w-4 mr-2" />
@@ -82,6 +103,25 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Favorites Link */}
+              <Link 
+                href="/favorites" 
+                className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium flex items-center justify-between"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center">
+                  <Heart className="h-5 w-5 mr-2" />
+                  Favorites
+                </div>
+                {isClient && favoriteCount > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {favoriteCount > 99 ? '99+' : favoriteCount}
+                  </Badge>
+                )}
+              </Link>
+              
+              {/* Mobile Book Repair Button */}
               <Link href="/contact" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
                   <Phone className="h-4 w-4 mr-2" />

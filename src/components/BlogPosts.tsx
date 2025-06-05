@@ -5,7 +5,7 @@ import { BlogPostType } from "@/lib/types";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import Image from "next/image";
-import { Calendar, Loader } from "lucide-react";
+import { Calendar, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
@@ -21,10 +21,16 @@ function BlogPosts() {
   },[]);
   if (isLoading)
     return (
-      <>
-        <Loader />
-        <p>Loading posts...</p>
-      </>
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid place-content-center min-h-[400px]">
+            <div className="flex flex-col items-center gap-4">
+              <LoaderCircle className="h-8 w-8 animate-spin" />
+              <p>Loading blog post...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
 
   return (
